@@ -1,0 +1,54 @@
+<h1>Vendor Products</h1>
+
+<!-- Display the existing vendor products -->
+<% @products.each do |product| %>
+  <p><%= product.name %></p>
+<% end %>
+
+<!-- Add Product Button -->
+<button id="add-product-btn">Add Product</button>
+
+<!-- Product Form -->
+<div id="product-form" style="display: none;">
+   <%= form_with(model: @product, remote: true) do |form| %>
+    <%= form.text_field :name, placeholder: 'Product Name' %>
+    <%= form.text_field :price, placeholder: 'Product Price' %>
+    <%= form.submit 'Create Product' %>
+  <% end %>
+</div>
+
+<!-- Ajax response container -->
+<div id="ajax-response"></div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var addProductBtn = document.getElementById('add-product-btn');
+    var productForm = document.getElementById('product-form');
+    var ajaxResponse = document.getElementById('ajax-response');
+
+    // Show the product form when the add product button is clicked
+    addProductBtn.addEventListener('click', function() {
+      productForm.style.display = 'block';
+    });
+
+    // Submit the product form via Ajax
+    var form = document.querySelector('form');
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      Rails.ajax({
+        type: form.method,
+        url: form.action,
+        data: new FormData(form),
+        success: function(data) {
+          // Handle success
+          ajaxResponse.textContent = 'Product created successfully.';
+        },
+        error: function(xhr) {
+          // Handle errors
+          ajaxResponse.textContent = 'Error creating product.';
+        }
+      });
+    });
+  });
+</script>
